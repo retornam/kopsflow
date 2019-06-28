@@ -1,6 +1,9 @@
 exports.sh
 config.tf
 .terraform/*
+terraform/vpcsetup/.terraform/*
 secrets/cluster.yaml
 secrets/values.yaml
+templates/cluster.yaml
+templates/values.yaml
 secrets.tfvars

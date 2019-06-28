@@ -1,0 +1,22 @@
+terraform {
+  backend "s3" {
+    # the bucket for terraform
+    bucket         = ""
+    # the filename to store state
+    key            = ""
+    # the aws region
+    region         = ""
+    # encrypt the file
+    encrypt        = "true"
+    # the dynamodb table to maintain locks
+    dynamodb_table = ""
+    # the kms key to use for encryption
+    kms_key_id     = ""
+  }
+}
+
+provider "aws" {
+  version = "~> 2.7"
+  # the aws region
+  region  = ""
+}

@@ -1,0 +1,12 @@
+# global exports
+export REGION=
+export CLUSTER_NAME=
+export ZONES=${REGION}a,${REGION}b,${REGION}c
+export KOPS_STATE_STORE=s3://
+
+
+SSH_PUBLIC_KEY=${1:-$HOME/.ssh/id_rsa.pub}
+VPCID=$(terraform output vpc_id)
+K8SNETWORKING=calico
+DNSZONEID=
+
