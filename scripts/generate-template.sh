@@ -58,6 +58,7 @@ case ${answerupdate:0:1} in
     "y") 
         echo "Creating cluster using cluster.yaml file"
         kops update cluster ${CLUSTERNAME} --state=${KOPS_STATE_STORE} \
+        --target=terraform  \
 		--out ../terraform/kubernetessetup/ --yes
         ;;
     *)
