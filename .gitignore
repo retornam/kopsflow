@@ -3,6 +3,7 @@ config.tf
 .terraform/*
 terraform/vpcsetup/.terraform/*
 terraform/kubernetessetup/*
+terraform/docker-registry/keys/*
 secrets/cluster.yaml
 secrets/values.yaml
 templates/cluster.yaml
