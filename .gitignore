@@ -2,6 +2,7 @@ exports.sh
 config.tf
 .terraform/*
 terraform/vpcsetup/.terraform/*
+terraform/kubernetessetup/*
 secrets/cluster.yaml
 secrets/values.yaml
 templates/cluster.yaml
