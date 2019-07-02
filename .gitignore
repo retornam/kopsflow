@@ -10,3 +10,4 @@ templates/cluster.yaml
 templates/values.yaml
 secrets.tfvars
 ansible.cfg
+hosts
