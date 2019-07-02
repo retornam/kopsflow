@@ -1,0 +1,11 @@
+version: '3'
+
+services:
+  registry:
+    restart: always
+    image: registry:2.7.1
+    ports:
+    - "5000:5000"
+    volumes:
+      - ./auth:/auth
+      - /etc/docker/compose/registry/registry.yml:/etc/docker/registry/config.yml

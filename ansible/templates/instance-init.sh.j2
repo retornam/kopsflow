@@ -1,0 +1,59 @@
+#!/bin/bash
+
+# Setups the registry machine to have a running
+# Docker registry that makes use of the instance
+# profile set in the machine to authenticate
+# against the S3 bucket set for storing registry's
+# data.
+
+set -o errexit
+set -o nounset
+
+main() {
+  install_packages
+  run_registry
+}
+
+# Installs the latest `docker-ce` from `apt` using
+# the installation script provided by the folks
+# at Docker.
+install_packages() {
+  echo "INFO:
+  Installing docker.
+  "
+  apt-get install -y docker.io apache2-utils nginx-full
+  curl -L "https://github.com/docker/compose/releases/download/1.24.0/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+  chmod a+x /usr/local/bin.docker-compose
+  rehash -r
+  mkdir -p /etc/docker/compose/registry/auth
+  mkdir -p /var/log/nginx/
+  rm -rf /etc/nginx/sites-enabled/default
+  ln -ns /etc/nginx/sites-available/${server_name} /etc/nginx/sites-enabled/$${server_name}
+  htpasswd -bBc /etc/docker/compose/registry/auth/registry.password registry  $${password}
+}
+
+# Runs the registry making use of the registry configuration
+# that should exist under `/etc/registry.yml`.
+#
+# Such configuration must be placed before running this one.
+run_registry() {
+  echo "INFO:
+  Starting docker registry.
+  "
+
+  if [[ ! -f "/etc/docker/compose/registry/docker-compose.yaml" ]]; then
+    echo "ERROR:
+  File /etc/docker/compose/registry/docker-compose.yaml does not exist.
+  "
+    exit 1
+  else
+    systemctl enable docker-cleanup.timer
+    systemctl enable docker-compose@registry
+    systemctl start docker-compose@registry
+    service nginx restart
+    echo "Docker registry started"
+  fi
+
+}
+
+main

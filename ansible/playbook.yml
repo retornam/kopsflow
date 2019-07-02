@@ -1,0 +1,118 @@
+---
+- hosts: [registry]
+  user: ubuntu
+  tasks:
+    - name: add certbot repository
+      apt_repository:
+        repo: ppa:certbot/certbot
+        state: present
+      become: yes
+    - name: install nginx
+      apt: pkg=nginx-full state=present
+      become: yes
+    - name: install apache2-utils
+      apt: pkg=apache2-utils state=present
+      become: yes
+    - name: install python-certbot-nginx
+      apt: pkg=python-certbot-nginx state=present
+      become: yes
+    - name: install zip
+      apt: pkg=zip state=present
+      become: yes
+    - name: install docker.io
+      apt: pkg=docker.io state=present
+      become: yes
+    - name: get docker-compose file
+      get_url:
+        url: https://github.com/docker/compose/releases/download/1.24.0/docker-compose-Linux-x86_64
+        dest: /usr/local/bin/docker-compose
+      become: yes
+    - name: chmod docker-compose
+      shell: chmod a+x /usr/local/bin/docker-compose
+      become: yes
+    - name: copy docker-cleanup.service
+      copy:
+        src: docker-cleanup.service
+        dest: /etc/systemd/system/docker-cleanup.service
+      become: yes
+    - name: copy docker-cleanup.timer
+      copy:
+        src: docker-cleanup.timer
+        dest: /etc/systemd/system/docker-cleanup.timer
+      become: yes
+    - name: copy docker-compose@service
+      copy:
+        src: docker-compose@.service
+        dest: /etc/systemd/system/docker-compose@.service
+      become: yes
+    - name: copy nginx.conf
+      copy:
+        src: nginx.conf
+        dest: /etc/nginx/nginx.conf
+      become: yes
+    - name: copy tls-snippets
+      template:
+        src: tls-snippets.j2
+        dest: "/etc/nginx/snippets/tls-{{ server_name }}"
+      become: yes
+    - name: copy registry nginx config
+      template:
+        src: registry.j2
+        dest: /etc/nginx/sites-available/registry
+      become: yes
+    - name: copy registry nginx to sites enabled
+      template:
+        src: registry.j2
+        dest: /etc/nginx/sites-enabled/registry
+      become: yes
+    - name: make compose directory
+      file:
+        path: /etc/docker/compose/registry
+        state: directory
+        mode: '0755'
+      become: yes
+    - name: make auth directoy
+      file:
+        path: /etc/docker/compose/registry/auth
+        state: directory
+        mode: '0755'
+      become: yes
+    - name: make registry password file
+      shell: touch /etc/docker/compose/registry/auth/registry.password
+      become: yes
+    - name: make auth directory
+      command: /usr/bin/htpasswd -bBc /etc/docker/compose/registry/auth/registry.password registry {{ password }}
+      become: yes
+    - name: copy registry.yaml
+      template:
+        src: registry.yml.j2
+        dest: /etc/docker/compose/registry/registry.yml
+      become: yes
+    - name: copy docker-compose.yaml
+      copy:
+        src: docker-compose.yml
+        dest: /etc/docker/compose/registry/docker-compose.yml
+      become: yes
+    - name: Check if certificate already exists.
+      stat:
+        path: "/etc/letsencrypt/live/{{ server_name }}/cert.pem"
+      register: letsencrypt_cert
+      become: yes
+    - name: stop services to allow certbot to generate a cert
+      systemd:
+        name: "{{ item  }}"
+        state: stopped
+      become: yes
+      with_items:
+        - nginx
+    - name: Generate new certificate if one doesn't exist.
+      shell: "/usr/bin/certbot certonly --standalone --noninteractive --agree-tos --email {{ email }} -d {{ server_name }}"
+      become: yes
+      when: letsencrypt_cert.stat.exists == False
+    - name: Start services after cert has been generated.
+      systemd:
+        name: "{{ item }}"
+        state: started
+      become: yes
+      with_items:
+        - nginx
