@@ -79,7 +79,7 @@ resource "aws_nat_gateway" "nat_gw" {
 
   lifecycle {
     prevent_destroy = true
-    ignore_changes        = [subnet_id,tags]
+    ignore_changes  = [subnet_id, tags]
 
   }
 }
@@ -142,7 +142,7 @@ resource "aws_route_table_association" "private" {
   route_table_id = aws_route_table.private[count.index].id
 
   lifecycle {
-    ignore_changes        = [subnet_id]
+    ignore_changes  = [subnet_id]
     prevent_destroy = true
   }
 }

@@ -13,15 +13,15 @@ resource "aws_s3_bucket" "bucket" {
   tags = {
     Environment = var.env
   }
-  
+
 }
 
 resource "aws_s3_bucket_public_access_block" "bucketblock" {
   bucket = "${aws_s3_bucket.bucket.id}"
 
-  block_public_acls   = true
-  block_public_policy = true
-  ignore_public_acls = true
+  block_public_acls       = true
+  block_public_policy     = true
+  ignore_public_acls      = true
   restrict_public_buckets = true
 }
 
@@ -39,8 +39,8 @@ resource "aws_acm_certificate" "tls" {
 }
 
 resource "aws_route53_record" "validation" {
-  name    =  aws_acm_certificate.tls.domain_validation_options.0.resource_record_name
-  type    =  aws_acm_certificate.tls.domain_validation_options.0.resource_record_type
+  name    = aws_acm_certificate.tls.domain_validation_options.0.resource_record_name
+  type    = aws_acm_certificate.tls.domain_validation_options.0.resource_record_type
   zone_id = data.aws_route53_zone.external.zone_id
   records = [aws_acm_certificate.tls.domain_validation_options.0.resource_record_value]
   ttl     = "60"
@@ -50,9 +50,9 @@ resource "aws_route53_record" "validation" {
 }
 
 resource "aws_acm_certificate_validation" "default" {
-  certificate_arn = aws_acm_certificate.tls.arn
+  certificate_arn         = aws_acm_certificate.tls.arn
   validation_record_fqdns = [aws_route53_record.validation.fqdn]
-  depends_on = [aws_route53_record.validation]
+  depends_on              = [aws_route53_record.validation]
   lifecycle {
     prevent_destroy = true
   }
@@ -86,7 +86,7 @@ module "subnet_pair" {
   rtags = {
     Infra             = "${var.env}.${var.name}"
     Environment       = var.env
-    Terraform       = "true"
+    Terraform         = "true"
     KubernetesCluster = "${var.env}.${var.name}"
   }
 }

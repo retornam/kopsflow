@@ -52,6 +52,6 @@ variable "rtags" {
 }
 
 variable "cidr_whitelist" {
-  type = list(string) 
+  type    = list(string)
   default = ["0.0.0.0/0"]
 }

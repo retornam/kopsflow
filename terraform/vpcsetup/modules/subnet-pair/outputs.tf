@@ -9,12 +9,12 @@ output "public_subnets_cidr_blocks" {
 
 output "public_subnets_az" {
   description = "List of public subnet availability_zones"
-  value = [aws_subnet.public.*.availability_zone]
+  value       = [aws_subnet.public.*.availability_zone]
 }
 
 output "private_subnets_az" {
   description = "List of public subnet availability_zones"
-  value = [aws_subnet.private.*.availability_zone]
+  value       = [aws_subnet.private.*.availability_zone]
 }
 
 output "private_subnets_cidr_blocks" {

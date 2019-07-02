@@ -32,8 +32,8 @@ output "privateNATGateways" {
 
 output "availability_zones" {
   value = [
-   for item in module.subnet_pair.availability_zones:
-   substr(item,-1, -1)
+    for item in module.subnet_pair.availability_zones :
+    substr(item, -1, -1)
   ]
 }
 
