@@ -9,3 +9,4 @@ secrets/values.yaml
 templates/cluster.yaml
 templates/values.yaml
 secrets.tfvars
+ansible.cfg
